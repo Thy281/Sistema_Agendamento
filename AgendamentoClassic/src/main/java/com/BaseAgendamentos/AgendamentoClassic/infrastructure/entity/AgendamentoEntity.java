@@ -18,7 +18,7 @@ public class AgendamentoEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String servico;
 
     @Column(nullable = false)
@@ -37,6 +37,14 @@ public class AgendamentoEntity {
     @Column(nullable = false)
     private LocalDateTime dataHoraAgendamento;
 
-    @Column(nullable = false)
+    @Builder.Default
+    @Column(nullable = false, updatable = false)
     private LocalDateTime dataInsercao = LocalDateTime.now();
+
+    @PrePersist
+    public void prePersist() {
+        if (dataInsercao == null) {
+            dataInsercao = LocalDateTime.now();
+        }
+    }
 }

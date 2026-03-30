@@ -5,7 +5,9 @@ import com.BaseAgendamentos.AgendamentoClassic.infrastructure.repository.Agendam
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -23,13 +25,13 @@ public class AgendamentoService {
         LocalDateTime horaAgendamento = agendamento.getDataHoraAgendamento();
         LocalDateTime horaFim = agendamento.getDataHoraAgendamento().plusHours(1);
 
-        AgendamentoEntity agendados = agendamentoRepository.findByServicoAndDataHoraAgendamentoBetween(
+        boolean jaExisteConflito = agendamentoRepository.existsByServicoAndDataHoraAgendamentoBetween(
                 agendamento.getServico(),
                 horaAgendamento,
                 horaFim
         );
 
-        if (Objects.isNull(agendados)) {
+        if (!jaExisteConflito) {
             return agendamentoRepository.save(agendamento);
         } else {
             throw new RuntimeException("Já existe um agendamento para este serviço no horário solicitado.");
@@ -40,13 +42,16 @@ public class AgendamentoService {
         agendamentoRepository.deleteByDataHoraAgendamentoAndCliente(dataHoraAgendamento, cliente);
     }
 
-    public AgendamentoEntity buscarAgendamentosDia(LocalDateTime data) {
-        LocalDateTime primeiraHoraDoDia = data.toLocalDate().atStartOfDay();
-        LocalDateTime horaFinalDia = data.toLocalDate().atTime(23, 59, 59);
+    public List<AgendamentoEntity> buscarAgendamentosDia(LocalDate data) {
+        LocalDateTime primeiraHoraDoDia = data.atStartOfDay();
+        LocalDateTime horaFinalDia = data.atTime(23, 59, 59);
 
-        AgendamentoEntity agendamentoHoras = agendamentoRepository.findByDataHoraAgendamentoBetween(primeiraHoraDoDia, horaFinalDia);
+        List<AgendamentoEntity> agendamentoHoras = agendamentoRepository.findByDataHoraAgendamentoBetween(
+                primeiraHoraDoDia,
+                horaFinalDia
+        );
 
-        if (Objects.isNull(agendamentoHoras)) {
+        if (agendamentoHoras.isEmpty()) {
             throw new RuntimeException("Não existem agendamentos para o dia solicitado.");
         } else {
             return agendamentoHoras;
@@ -71,13 +76,14 @@ public class AgendamentoService {
         validarTelefone(novoTelefone);
 
         LocalDateTime horaFim = novaDataHora.plusHours(1);
-        AgendamentoEntity conflito = agendamentoRepository.findByServicoAndDataHoraAgendamentoBetween(
+        boolean conflito = agendamentoRepository.existsByServicoAndDataHoraAgendamentoBetweenAndIdNot(
                 novoServico,
                 novaDataHora,
-                horaFim
+                horaFim,
+                agenda.getId()
         );
 
-        if (Objects.nonNull(conflito) && !Objects.equals(conflito.getId(), agenda.getId())) {
+        if (conflito) {
             throw new RuntimeException("Já existe um agendamento para este serviço no horário solicitado.");
         }
 

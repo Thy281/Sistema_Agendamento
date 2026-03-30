@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @RestController
@@ -30,12 +32,12 @@ public class AgendamentoController {
     }
 
     @GetMapping
-    public ResponseEntity<AgendamentoEntity> buscarAgendamentoDia(@RequestParam LocalDateTime data) {
-        AgendamentoEntity agendamento = agendamentoService.buscarAgendamentosDia(data);
-        return ResponseEntity.ok(agendamento);
+    public ResponseEntity<List<AgendamentoEntity>> buscarAgendamentoDia(@RequestParam LocalDate data) {
+        List<AgendamentoEntity> agendamentos = agendamentoService.buscarAgendamentosDia(data);
+        return ResponseEntity.ok(agendamentos);
     }
 
-    @PostMapping
+    @PutMapping
     public ResponseEntity<AgendamentoEntity> alterarAgendamento(
             @RequestBody AgendamentoEntity agendamento,
             @RequestParam String cliente,
