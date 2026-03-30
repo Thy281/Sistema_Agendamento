@@ -18,7 +18,7 @@ public interface AgendamentoRepository extends JpaRepository<AgendamentoEntity, 
     );
 
     @Transactional
-    void deleteByDataHoraAgendamentoAndCliente(LocalDateTime dataHoraAgendamento, String cliente);
+    long deleteByDataHoraAgendamentoAndClienteIgnoreCase(LocalDateTime dataHoraAgendamento, String cliente);
 
     List<AgendamentoEntity> findByDataHoraAgendamentoBetween(LocalDateTime dataHoraInicial, LocalDateTime dataHoraFinal);
 

@@ -3,6 +3,7 @@ package com.BaseAgendamentos.AgendamentoClassic.controller;
 import com.BaseAgendamentos.AgendamentoClassic.infrastructure.entity.AgendamentoEntity;
 import com.BaseAgendamentos.AgendamentoClassic.service.AgendamentoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +27,7 @@ public class AgendamentoController {
     @DeleteMapping
     public ResponseEntity<Void> deletarAgendamento(
             @RequestParam String cliente,
-            @RequestParam LocalDateTime dataHoraAgendamento) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataHoraAgendamento) {
         agendamentoService.deletarAgendamento(dataHoraAgendamento, cliente);
         return ResponseEntity.noContent().build();
     }

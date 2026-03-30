@@ -39,7 +39,15 @@ public class AgendamentoService {
     }
 
     public void deletarAgendamento(LocalDateTime dataHoraAgendamento, String cliente) {
-        agendamentoRepository.deleteByDataHoraAgendamentoAndCliente(dataHoraAgendamento, cliente);
+        String clienteNormalizado = Objects.nonNull(cliente) ? cliente.trim() : null;
+        long registrosRemovidos = agendamentoRepository.deleteByDataHoraAgendamentoAndClienteIgnoreCase(
+                dataHoraAgendamento,
+                clienteNormalizado
+        );
+
+        if (registrosRemovidos == 0) {
+            throw new RuntimeException("Agendamento não encontrado para o cliente e horário informados.");
+        }
     }
 
     public List<AgendamentoEntity> buscarAgendamentosDia(LocalDate data) {
